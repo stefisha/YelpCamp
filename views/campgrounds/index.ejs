@@ -11,19 +11,39 @@
                     <a class="btn btn-outline-primary btn-large" href="/campgrounds/new">Add New Campground!</a>
                 </p>
                 <p>
-                    <form action="/campgrounds" method="GET" class="form-inline" id="campground-search">
-                      <div class="form-group">
-                        <input type="text" name="search" placeholder="Campground search..." class="form-control">
-                      </div>
-                    </form>
+                    
+                    <div class="form-group">
+                    <input type="text" id="search" name="search" placeholder="Campground search..." class="form-control">
+                    </div>
+
                 </p>
             </div>
             
         </div>
     </header>
 
+    <script>
 
-    <div class="row text-center" style="display: flex; flex-wrap: wrap;">
+    $(document).ready(function(){
+        $(function () {
+            $('#search').on('input',function(e){
+                var vrednost = $("#search").val();
+                $.get('/campgrounds/searching', { search: vrednost }, function (data) {
+
+                    $("#campsList").empty();
+
+                    data.forEach(function(campground){
+                        $("#campsList").append('<div class="col-md-3 col-sm-6">  <div class="img-thumbnail" > <img src="'+campground.image +'" width="100%"> <div class="caption">  <h4>'+campground.name+'</h4> </div>   <p>   <a href="/campgrounds/'+campground._id +'" class="btn btn-primary">More info</a>    </p>  </div>  </div>');
+                    });
+
+                });
+            });
+        });
+    });           
+    </script>
+    
+
+    <div id="campsList" class="row text-center" style="display: flex; flex-wrap: wrap;">
         <% campgrounds.forEach(function(campground){ %>
             <div class="col-md-3 col-sm-6">
                 <div class="img-thumbnail" >

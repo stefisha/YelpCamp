@@ -31,6 +31,18 @@ router.get('/', function(req, res) {
 	}
 });
 
+router.get('/searching', function(req, res){
+		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+		// Get searched campgrounds from DB
+		campground.find({ name: regex }, function(err, allCampgrounds) {
+			if (err) {
+				console.log(err);
+			} else {
+				res.send(allCampgrounds);
+			}
+		});
+   });
+
 // CREATE - add new campground to DB
 
 router.post('/', middleware.isLoggedIn, function(req, res) {
