@@ -1,0 +1,10 @@
+
+[
+    <% var firstLine = true; %>
+    <% campgrounds.forEach(function(campground){ %>
+        <% if(!firstLine){ %>,<% } %>  
+
+        <% firstLine = false %>                       
+        <%= campground %>                  
+    <% }); %>
+]
