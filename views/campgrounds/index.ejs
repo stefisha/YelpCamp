@@ -39,7 +39,23 @@
                 });
             });
         });
-    });           
+    }); 
+    
+    setInterval(() => {//azururanje kampova
+        var vrednost = $("#search").val();
+                $.get('/campgrounds/searching', { search: vrednost }, function (data) {
+
+                    $("#campsList").empty();
+
+                    data.forEach(function(campground){
+                        $("#campsList").append('<div class="col-md-3 col-sm-6">  <div class="img-thumbnail" > <img src="'+campground.image +'" width="100%"> <div class="caption">  <h4>'+campground.name+'</h4> </div>   <p>   <a href="/campgrounds/'+campground._id +'" class="btn btn-primary">More info</a>    </p>  </div>  </div>');
+                    });
+
+                });
+    }, 10000);
+
+
+
     </script>
     
 
