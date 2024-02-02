@@ -1,6 +1,6 @@
 # YelpCamp
 Live Demo
-To see the app in action, go to https://yelpcamp-desktop.herokuapp.com/
+To see the app in action, go to https://yelpcamp-desktop.herokuapp.com/, may not be available as of November 28th, 2022 due to Heroku shutting down the free tier hosting.
 # Features
 
 ## Authentication:
