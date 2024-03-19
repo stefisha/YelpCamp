@@ -28,11 +28,6 @@ mongoose.connect(dbUrl, {
  	useNewUrlParser: true
  });
 
-// mongoose.connect('mongodb+srv://stefan:cira@yelpcamp.xph7nsb.mongodb.net/?retryWrites=true&w=majority&appName=yelpcamp', {
-// 	useUnifiedTopology: true,
-// 	useNewUrlParser: true
-// });
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
