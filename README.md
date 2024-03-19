@@ -1,6 +1,6 @@
 # YelpCamp
 Live Demo
-To see the app in action, go to https://yelpcamp-redeploy-4a7a09068588.herokuapp.com/.
+To see the app in action, go to https://yelpcamp.stefisha.me/.
 # Features
 
 ## Authentication:
