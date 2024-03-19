@@ -11,6 +11,7 @@ var express = require('express'),
 	flash = require('connect-flash');
 
 //requring routes
+require('dotenv').config();
 
 var commentRoutes = require('./routes/comments'),
 	campgroundroutes = require('./routes/campgrounds'),
@@ -20,10 +21,17 @@ var commentRoutes = require('./routes/comments'),
 
 // mongoose.connect('mongodb://localhost:27017/yelp_camp', { useUnifiedTopology: true, useNewUrlParser: true });
 
-mongoose.connect('mongodb+srv://stefan:cira@yelpcamp-sirz8.mongodb.net/test?retryWrites=true&w=majority', {
+const dbUrl = process.env.DATABASEURL ||'mongodb://localhost:27017/yelp_camp';
+
+mongoose.connect(dbUrl, {
  	useUnifiedTopology: true,
  	useNewUrlParser: true
  });
+
+// mongoose.connect('mongodb+srv://stefan:cira@yelpcamp.xph7nsb.mongodb.net/?retryWrites=true&w=majority&appName=yelpcamp', {
+// 	useUnifiedTopology: true,
+// 	useNewUrlParser: true
+// });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
