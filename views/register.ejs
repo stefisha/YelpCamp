@@ -4,16 +4,17 @@
 
 <div class="container">
   <div class="row">
-    <div style="width: 30%; margin: 30px auto;">
+    <div style="max-width: 28rem; margin: 30px auto;">
       <form action="/register" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="form-group">
-          <input class="form-control" pattern=".{6,12}" title="Username must be 6 to 12 characters" type="text" name="username" placeholder="username" required>
+          <input aria-label="Username" class="form-control" pattern="[A-Za-z0-9_]{6,32}" title="Use 6 to 32 letters, numbers or underscores" autocomplete="username" type="text" name="username" placeholder="username" required>
         </div>
         <div class="form-group">
-          <input class="form-control" pattern=".{5,10}" title="Password must be 5 to 10 characters" type="password" name="password" placeholder="password" required>
+          <input aria-label="Password" class="form-control" minlength="12" maxlength="128" autocomplete="new-password" type="password" name="password" placeholder="password" required>
         </div>
                   <!-- <div class="form-group">
-            <input class="form-control" type="text" name="adminCode" placeholder="Admin Code">
+            <input aria-label="Admincode" class="form-control" type="text" name="adminCode" placeholder="Admin Code">
         </div> -->
         <button class="btn btn-lg btn-success btn-block">Sign Up</button>
       </form>

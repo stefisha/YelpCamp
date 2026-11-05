@@ -1,27 +1,23 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
       <title>YelpCamp</title>
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+      <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
       <link rel="stylesheet" href="/stylesheets/main.css">
-      <link href="https://fonts.googleapis.com/css?family=Lato:400,700i&display=swap" rel="stylesheet">
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" 
-      integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ"   
-      crossorigin="anonymous">
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js" defer></script>
     </head>
     <body>
         <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#toggleNav" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#toggleNav" aria-controls="toggleNav" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="toggleNav">
               <ul class="navbar-nav">
-                  <a class="navbar-brand" href="/"><i class="fab fa-gripfire"></i> YelpCamp</a>
+                  <a class="navbar-brand" href="/">YelpCamp</a>
               </ul>
-              <ul class="navbar-nav mr-auto">
+              <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                   <a class="nav-link" href="/">Home</a>
                 </li>
@@ -42,10 +38,11 @@
                     <a class="nav-link" href="#">Signed in as <%= currentUser.username %></a>
                   </li>
                 <li class="nav-link">
-                  <a class="nav-link" href="/logout">Logout</a>
+                  <form action="/logout" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="nav-link btn btn-link" type="submit">Logout</button></form>
                 </li>
                 <% }%>
-              </ul> 
+              </ul>
             </div>
           </nav>
 
@@ -62,5 +59,5 @@
             <% } %>
           </div>
 
-          
-    
+
+

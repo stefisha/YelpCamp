@@ -1,135 +1,93 @@
-var express = require('express');
-var router = express.Router();
-var passport = require('passport');
-var user = require('../models/user');
-var campground = require('../models/campground');
-
-//root route
-
-router.get('/', function(req, res) {
-	res.render('landing');
-});
-
-// register form foute
-
-router.get('/register', function(req, res) {
-	res.render('register');
-});
-
-// handle sign up logic
-
-router.post('/register', function(req, res) {
-	var newUser = new user({ username: req.body.username });
-	user.register(newUser, req.body.password, function(err, user) {
-		if (err) {
-			req.flash('error', err.message);
-			return res.render('register');
-		}
-		passport.authenticate('local')(req, res, function() {
-			req.flash('success', 'Welcome to YelpCamp!' + user.username);
-			res.redirect('/campgrounds');
-		});
-	});
-});
-
-// show login form
-
-router.get('/login', function(req, res) {
-	res.render('login');
-});
-
-//handling login form
-
-router.post(
-	'/login',
-	passport.authenticate('local', {
-		successRedirect: '/campgrounds',
-		failureRedirect: '/login'
-	}),
-	function(req, res) {}
-);
-
-// logout
-
-router.get('/logout', function(req, res) {
-	req.logout();
-	req.flash('success', 'Logged you out!');
-	res.redirect('/campgrounds');
-});
-
-//api
-
-// prikazi sve kampove
-
-router.get('/api', function(req, res) {
-    campground.find({}, function(err, allCampgrounds) {
-        if (err) {
-            console.log(err);
-        } else {
-            res.render('api', { campgrounds: allCampgrounds, currentUser: req.user });
-        }
+"use strict";
+const { rateLimit } = require("express-rate-limit");
+const User = require("../models/user");
+const Campground = require("../models/campground");
+const m = require("../middleware");
+const { text, campgroundInput, HttpError } = require("../lib/validation");
+module.exports = function authRoutes(passport) {
+  const router = require("express").Router();
+  const limit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: "Too many account attempts. Please try again in 15 minutes.",
+  });
+  router.get("/", (req, res) => res.render("landing"));
+  router.get("/register", (req, res) => res.render("register"));
+  router.post("/register", limit, async (req, res, next) => {
+    const username = text(req.body.username, "Username", 32);
+    if (!/^[a-zA-Z0-9_]{6,32}$/.test(username))
+      throw new HttpError(
+        400,
+        "Use 6 to 32 letters, numbers or underscores for your username.",
+      );
+    if (
+      typeof req.body.password !== "string" ||
+      req.body.password.length < 12 ||
+      req.body.password.length > 128
+    ) {
+      throw new HttpError(
+        400,
+        "Choose a password between 12 and 128 characters.",
+      );
+    }
+    const account = await User.register(
+      new User({ username }),
+      req.body.password,
+    );
+    req.logIn(account, (err) => {
+      if (err) return next(err);
+      req.flash("success", `Welcome to YelpCamp, ${account.username}!`);
+      res.redirect("/campgrounds");
     });
-});
-
-//ubacivanje kampa
-
-//http://localhost:3000/api?name=ime&image=https://ddl.rs/wp-content/uploads/2019/08/maldivi-plaza-insta.jpg&price=200&description=opis
-router.post('/api', function(req, res) {
-    var name = req.param("name");
-    var image = req.param("image");
-    var price = req.param("price");
-    var desc = req.param("description");
-    var author = {
-        id: "5e077c74271b530017fa35fa",
-        username: "milos97"
-    };
-    var newCampground = { name: name, price: price, image: image, description: desc, author: author };
-    // create a new campground and save to database
-    campground.create(newCampground, function(err, newlyCreated) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(newlyCreated);
-            //res.redirect('/campgrounds');
-        }
+  });
+  router.get("/login", (req, res) => res.render("login"));
+  router.post("/login", limit, (req, res, next) => {
+    if (
+      typeof req.body.username !== "string" ||
+      typeof req.body.password !== "string" ||
+      req.body.username.length > 32 ||
+      req.body.password.length > 128
+    ) {
+      throw new HttpError(400, "Enter a valid username and password.");
+    }
+    passport.authenticate("local", {
+      successRedirect: "/campgrounds",
+      failureRedirect: "/login",
+      failureFlash: "Invalid username or password.",
+    })(req, res, next);
+  });
+  router.post("/logout", (req, res, next) =>
+    req.logout((err) => {
+      if (err) return next(err);
+      req.flash("success", "Logged you out.");
+      res.redirect("/campgrounds");
+    }),
+  );
+  router.get("/api", async (req, res) =>
+    res.json(
+      await Campground.find({})
+        .select("name price image description author")
+        .sort({ _id: -1 })
+        .limit(100),
+    ),
+  );
+  router.post("/api", m.isLoggedIn, async (req, res) => {
+    const record = await Campground.create({
+      ...campgroundInput(req.body),
+      author: { id: req.user._id, username: req.user.username },
     });
-    res.status(200).json({status:"ok"});
-});
-
-//update
-//http://localhost:3000/api/5e207ad4e4bb3313e083690e?name=plaza&price=300&description=proba&image=d
-router.put('/api/:id', function(req, res) {
-    campground.findByIdAndUpdate(req.params.id,
-         {
-            name: req.param("name"),
-            price: req.param("price"),
-            image: req.param("image"),
-            description: req.param("description")
-        }
-        
-    , function(err, updaedCampground) {
-        if (err) {
-            res.status(500).json({status:"error"});
-        } else {
-            res.status(200).json({status:"ok"});
-        }
-    });
-
-});
-
-//delete
-
-router.delete('/api/:id', function(req, res) {
-    campground.findByIdAndRemove(req.params.id, function(err) {
-        if (err) {
-            res.status(500).json({status:"error"});
-        } else {
-            res.status(200).json({status:"ok"});
-        }
-    });
-});
-
-
-
-
-module.exports = router;
+    res.status(201).json(record);
+  });
+  router.put("/api/:id", m.checkCampgroundOwnership, async (req, res) => {
+    Object.assign(req.campground, campgroundInput(req.body));
+    await req.campground.save();
+    res.json(req.campground);
+  });
+  router.delete("/api/:id", m.checkCampgroundOwnership, async (req, res) => {
+    await require("./campgrounds").deleteCampground(req.campground);
+    res.sendStatus(204);
+  });
+  return router;
+};

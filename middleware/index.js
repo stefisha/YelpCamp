@@ -1,54 +1,51 @@
-var campground = require('../models/campground');
-var comment = require('../models/comment');
-var middlewareObj = {};
-
-middlewareObj.checkCampgroundOwnership = function(req, res, next) {
-	if (req.isAuthenticated()) {
-		campground.findById(req.params.id, function(err, foundCampground) {
-			if (err) {
-				req.flash('error', 'Campground not found!');
-				res.redirect('back');
-			} else {
-				if (foundCampground.author.id.equals(req.user._id) || req.user.isAdmin) {
-					next();
-				} else {
-					req.flash('error', "You don't have permission to do that!");
-					res.redirect('back');
-				}
-			}
-		});
-	} else {
-		req.flash('error', 'You need to be logged in to do that!');
-		res.redirect('back');
-	}
+"use strict";
+const mongoose = require("mongoose");
+const Campground = require("../models/campground");
+const Comment = require("../models/comment");
+const { HttpError } = require("../lib/validation");
+function validId(id) {
+  if (!mongoose.isObjectIdOrHexString(id))
+    throw new HttpError(404, "Record not found.");
+}
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  if (req.originalUrl.startsWith("/api"))
+    return next(new HttpError(401, "Please log in."));
+  req.flash("error", "You need to be logged in to do that.");
+  res.redirect("/login");
+}
+async function loadCampground(req, res, next) {
+  validId(req.params.id);
+  req.campground = await Campground.findById(req.params.id);
+  if (!req.campground) throw new HttpError(404, "Campground not found.");
+  next();
+}
+function owns(document, user) {
+  return user && (user.isAdmin || document.author?.id?.equals(user._id));
+}
+async function checkCampgroundOwnership(req, res, next) {
+  if (!req.isAuthenticated()) return isLoggedIn(req, res, next);
+  await loadCampground(req, res, () => {});
+  if (!owns(req.campground, req.user))
+    throw new HttpError(403, "You cannot change this campground.");
+  next();
+}
+async function checkCommentOwnership(req, res, next) {
+  if (!req.isAuthenticated()) return isLoggedIn(req, res, next);
+  await loadCampground(req, res, () => {});
+  validId(req.params.comment_id);
+  if (!req.campground.comments.some((id) => id.equals(req.params.comment_id))) {
+    throw new HttpError(404, "Comment not found in this campground.");
+  }
+  req.comment = await Comment.findById(req.params.comment_id);
+  if (!req.comment) throw new HttpError(404, "Comment not found.");
+  if (!owns(req.comment, req.user))
+    throw new HttpError(403, "You cannot change this comment.");
+  next();
+}
+module.exports = {
+  isLoggedIn,
+  loadCampground,
+  checkCampgroundOwnership,
+  checkCommentOwnership,
 };
-
-middlewareObj.checkCommentOwnership = function(req, res, next) {
-	if (req.isAuthenticated()) {
-		comment.findById(req.params.comment_id, function(err, foundComment) {
-			if (err) {
-				res.redirect('back');
-			} else {
-				if (foundComment.author.id.equals(req.user._id) || req.user.isAdmin) {
-					next();
-				} else {
-					req.flash('error', "You don't have permission to do that!");
-					res.redirect('back');
-				}
-			}
-		});
-	} else {
-		req.flash('error', 'You need to be logged in to do that!');
-		res.redirect('back');
-	}
-};
-
-middlewareObj.isLoggedIn = function(req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
-	req.flash('error', 'You need to be logged in to do that!');
-	res.redirect('/login');
-};
-
-module.exports = middlewareObj;
