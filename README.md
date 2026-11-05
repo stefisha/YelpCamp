@@ -1,4 +1,4 @@
-![YelpCamp, an Internet Technologies course project at FON](docs/banner.png)
+![YelpCamp, an Internet Technologies project at FON](docs/banner.png)
 
 # YelpCamp
 
@@ -10,7 +10,7 @@ publish listings, discuss them in comments, and manage their own contributions.
 
 ## Academic context
 
-Originally developed as a course project for **Internet Technologies at FON**.
+Originally developed as an **Internet Technologies project at FON**.
 The application combines server rendered pages, a MongoDB database, account
 authentication and web application development fundamentals.
 
@@ -123,7 +123,9 @@ and send valid form tokens. Logout uses `POST /logout`. Database collection name
 and the existing author references remain compatible with the original app.
 Back up an existing database before upgrading its MongoDB server.
 
-The previously listed hosted demo has not been verified and is omitted here.
+The application has been run locally for verification. The README screenshot
+shows a local test instance with demonstration listings. This is not a public
+deployment. The previously listed hosted demo has not been verified.
 
 ## Structure
 
