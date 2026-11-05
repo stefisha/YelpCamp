@@ -111,21 +111,11 @@ input validation, comment relationships, deletion cleanup and error responses.
 A DOM regression test checks that search results display markup as literal text.
 GitHub Actions runs these checks on Node.js 22 and 24.
 
-## Deployment
+## Project status
 
-Use HTTPS, a private or authenticated MongoDB connection, a stable random session
-secret and the supported Node runtime. Configure proxy trust for your actual
-network. The server connects to MongoDB before accepting requests and closes
-connections on shutdown.
-
-The old API accepted mutations without authentication. Clients must now sign in
-and send valid form tokens. Logout uses `POST /logout`. Database collection names
-and the existing author references remain compatible with the original app.
-Back up an existing database before upgrading its MongoDB server.
-
-The application has been run locally for verification. The README screenshot
-shows a local test instance with demonstration listings. This is not a public
-deployment. The previously listed hosted demo has not been verified.
+This repository provides the application source, a preview and local setup
+instructions. There is no active public application demo. Run YelpCamp locally
+using the instructions above.
 
 ## Structure
 
