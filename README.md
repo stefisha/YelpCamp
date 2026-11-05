@@ -1,3 +1,5 @@
+![YelpCamp, an Internet Technologies course project at FON](docs/banner.png)
+
 # YelpCamp
 
 A campground discovery and community application built with Node.js, Express,
@@ -5,6 +7,12 @@ MongoDB and EJS. Visitors can browse and search campgrounds. Registered users ca
 publish listings, discuss them in comments, and manage their own contributions.
 
 ![YelpCamp campground grid with demonstration listings](docs/preview.png)
+
+## Academic context
+
+Originally developed as a course project for **Internet Technologies at FON**.
+The application combines server rendered pages, a MongoDB database, account
+authentication and web application development fundamentals.
 
 ## Features
 
